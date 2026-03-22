@@ -1,22 +1,53 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-green-50 to-white">
+  <div class="min-h-screen bg-surface-950 flex flex-col">
     <Navbar />
-    
-    <main class="pt-20">
+
+    <main class="flex-1 pt-16">
       <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
+        <transition name="page" mode="out-in">
           <component :is="Component" />
         </transition>
       </router-view>
     </main>
 
-    <footer class="bg-green-900 text-white mt-20">
-      <div class="container mx-auto px-4 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div class="footer-feature" v-for="feature in features" :key="feature.title">
-            <i :class="feature.icon" class="text-3xl mb-4"></i>
-            <h3 class="text-xl font-semibold mb-2">{{ feature.title }}</h3>
-            <p class="text-green-200">{{ feature.description }}</p>
+    <!-- Footer -->
+    <footer class="mt-24 border-t border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 py-16">
+        <!-- Top section -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <!-- Brand -->
+          <div class="md:col-span-1">
+            <div class="flex items-center gap-2.5 mb-4">
+              <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-base">🍃</div>
+              <span class="text-lg font-bold text-white">FruitCo</span>
+            </div>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Frutas frescas e premium entregues direto na sua porta. Qualidade garantida.
+            </p>
+          </div>
+
+          <!-- Features -->
+          <div v-for="feature in features" :key="feature.title" class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <i :class="feature.icon" class="text-emerald-400 text-sm"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-white text-sm mb-1">{{ feature.title }}</h3>
+              <p class="text-slate-400 text-sm">{{ feature.description }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom -->
+        <div class="divider pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p class="text-slate-500 text-sm">© 2026 FruitCo. Todos os direitos reservados.</p>
+          <div class="flex items-center gap-6">
+            <span class="text-slate-500 text-xs">Pagamento seguro</span>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400 text-xs px-2 py-1 bg-surface-800 rounded border border-slate-700">VISA</span>
+              <span class="text-slate-400 text-xs px-2 py-1 bg-surface-800 rounded border border-slate-700">MASTER</span>
+              <span class="text-slate-400 text-xs px-2 py-1 bg-surface-800 rounded border border-slate-700">PIX</span>
+            </div>
           </div>
         </div>
       </div>
@@ -25,49 +56,40 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useCartStore } from '@/stores/cart'
 import Navbar from '@/components/Navbar.vue'
-
-const cartStore = useCartStore()
-const cartCount = computed(() => cartStore.totalItems)
 
 const features = [
   {
     icon: 'fas fa-award',
-    title: 'High Quality',
-    description: 'Crafted from top materials'
-  },
-  {
-    icon: 'fas fa-shield-alt',
-    title: 'Warranty Protection',
-    description: 'Over 2 years'
+    title: 'Alta Qualidade',
+    description: 'Selecionadas com cuidado para garantir frescor'
   },
   {
     icon: 'fas fa-truck',
-    title: 'Free Shipping',
-    description: 'Order over 150 $'
+    title: 'Frete Grátis',
+    description: 'Em pedidos acima de R$150'
   },
   {
     icon: 'fas fa-headset',
-    title: '24/7 Support',
-    description: 'Dedicated support'
+    title: 'Suporte 24/7',
+    description: 'Estamos sempre aqui para você'
   }
 ]
 </script>
 
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+<style>
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.page-enter-from {
   opacity: 0;
+  transform: translateY(8px);
 }
 
-.footer-feature {
-  @apply text-center p-6 bg-green-800 rounded-lg hover:bg-green-700 transition-colors;
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
-</style> 
+</style>

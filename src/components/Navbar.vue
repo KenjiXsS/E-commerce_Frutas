@@ -1,75 +1,92 @@
 <template>
-  <nav class="bg-white shadow-lg">
-    <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center py-4">
-        <router-link to="/" class="flex items-center">
-          <span class="text-2xl font-bold text-gradient">Fruit Store</span>
+  <nav
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    :class="scrolled
+      ? 'bg-surface-900/95 backdrop-blur-xl border-b border-slate-700/50 shadow-xl'
+      : 'bg-transparent'"
+  >
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <router-link to="/" class="flex items-center gap-2.5 group">
+          <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-base transition-transform group-hover:scale-110">
+            🍃
+          </div>
+          <span class="text-lg font-bold text-white">FruitCo</span>
         </router-link>
 
-        <div class="hidden md:flex items-center space-x-8">
-          <router-link
-            v-for="link in links"
-            :key="link.path"
-            :to="link.path"
-            class="text-gray-600 hover:text-green-600 transition-colors"
-          >
-            {{ link.name }}
+        <!-- Nav Links (desktop) -->
+        <div class="hidden md:flex items-center gap-8">
+          <router-link to="/" class="nav-link" :class="{ 'nav-link-active': $route.path === '/' }">
+            Produtos
+          </router-link>
+          <router-link to="/cart" class="nav-link" :class="{ 'nav-link-active': $route.path === '/cart' }">
+            Carrinho
           </router-link>
         </div>
 
-        <div class="flex items-center space-x-4">
+        <!-- Right actions -->
+        <div class="flex items-center gap-3">
+          <!-- Cart -->
           <router-link
             to="/cart"
-            class="relative text-gray-600 hover:text-green-600 transition-colors"
+            class="relative flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-white hover:bg-surface-700 transition-all duration-200"
           >
-            <i class="fas fa-shopping-cart text-xl"></i>
+            <i class="fas fa-shopping-cart text-base"></i>
             <span
               v-if="cartItemCount > 0"
-              class="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+              class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 shadow-glow-sm"
             >
-              {{ cartItemCount }}
+              {{ cartItemCount > 99 ? '99+' : cartItemCount }}
             </span>
           </router-link>
 
+          <!-- Authenticated user -->
           <template v-if="isAuthenticated">
-            <!-- User Dropdown Menu -->
-            <div class="relative" @click="toggleDropdown">
-              <button class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
-                <i class="fas fa-user-circle text-xl"></i>
-                <span class="hidden md:inline">{{ user?.firstName || 'Account' }}</span>
-                <i class="fas fa-chevron-down text-xs"></i>
+            <div class="relative" ref="dropdownRef">
+              <button
+                @click="toggleDropdown"
+                class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-surface-700 transition-all duration-200 text-sm font-medium"
+              >
+                <div class="w-6 h-6 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center justify-center">
+                  <i class="fas fa-user text-emerald-400 text-xs"></i>
+                </div>
+                <span class="hidden md:inline">{{ user?.firstName || 'Conta' }}</span>
+                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': isDropdownOpen }"></i>
               </button>
-              
-              <!-- Dropdown Content -->
-              <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                <router-link
-                  to="/profile"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
+
+              <!-- Dropdown -->
+              <transition name="dropdown">
+                <div
+                  v-if="isDropdownOpen"
+                  class="absolute right-0 top-full mt-2 w-48 bg-surface-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden"
                 >
-                  <i class="fas fa-user mr-2"></i> My Profile
-                </router-link>
-                <router-link
-                  to="/orders"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
-                >
-                  <i class="fas fa-shopping-bag mr-2"></i> My Orders
-                </router-link>
-                <button
-                  @click="handleLogout"
-                  class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
-                >
-                  <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                </button>
-              </div>
+                  <router-link
+                    to="/profile"
+                    @click="isDropdownOpen = false"
+                    class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-surface-700 transition-colors"
+                  >
+                    <i class="fas fa-user-circle w-4 text-slate-400"></i>
+                    Meu Perfil
+                  </router-link>
+                  <div class="divider mx-2"></div>
+                  <button
+                    @click="handleLogout"
+                    class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                  >
+                    <i class="fas fa-sign-out-alt w-4"></i>
+                    Sair
+                  </button>
+                </div>
+              </transition>
             </div>
           </template>
+
+          <!-- Guest -->
           <template v-else>
-            <router-link
-              to="/login"
-              class="btn btn-primary flex items-center space-x-2"
-            >
+            <router-link to="/login" class="btn btn-primary text-xs px-4 py-2">
               <i class="fas fa-sign-in-alt"></i>
-              <span>Login</span>
+              Entrar
             </router-link>
           </template>
         </div>
@@ -79,20 +96,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCartStore } from '@/stores/cart'
 import axios from 'axios'
 
 const router = useRouter()
-const links = [
-  { name: 'Home', path: '/' },
-  { name: 'Cart', path: '/cart' }
-]
-
-const cartItemCount = ref(0)
-const isAuthenticated = computed(() => !!localStorage.getItem('token'))
+const cartStore = useCartStore()
+const scrolled = ref(false)
 const isDropdownOpen = ref(false)
+const dropdownRef = ref(null)
 const user = ref(null)
+
+const cartItemCount = computed(() => cartStore.totalItems)
+const isAuthenticated = computed(() => !!localStorage.getItem('token'))
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
@@ -108,45 +125,43 @@ const fetchUserProfile = async () => {
   try {
     const token = localStorage.getItem('token')
     if (!token) return
-
     const response = await axios.get('http://localhost:5000/api/users/profile', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
     user.value = response.data
-  } catch (error) {
-    console.error('Error fetching user profile:', error)
+  } catch {}
+}
+
+const handleScroll = () => {
+  scrolled.value = window.scrollY > 20
+}
+
+const handleClickOutside = (e) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(e.target)) {
+    isDropdownOpen.value = false
   }
 }
 
 onMounted(() => {
-  if (isAuthenticated.value) {
-    fetchUserProfile()
-  }
+  window.addEventListener('scroll', handleScroll)
+  document.addEventListener('click', handleClickOutside)
+  if (isAuthenticated.value) fetchUserProfile()
 })
 
-// Close dropdown when clicking outside
-document.addEventListener('click', (e) => {
-  const dropdown = document.querySelector('.relative')
-  if (dropdown && !dropdown.contains(e.target)) {
-    isDropdownOpen.value = false
-  }
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
 <style scoped>
-.text-gradient {
-  background: linear-gradient(45deg, #10B981, #059669);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
-
-.btn {
-  @apply px-4 py-2 rounded-md font-medium transition-colors;
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
 }
-
-.btn-primary {
-  @apply bg-green-600 text-white hover:bg-green-700;
-}
-</style> 
+</style>

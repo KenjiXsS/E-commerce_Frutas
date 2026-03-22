@@ -1,74 +1,103 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-green-50 to-white py-12">
-    <div class="container mx-auto px-4">
-      <div class="max-w-md mx-auto">
-        <div class="text-center mb-12 animate-fade-in">
-          <h1 class="text-4xl font-bold text-gradient mb-4">Welcome Back</h1>
-          <p class="text-gray-600">Sign in to your account</p>
+  <div class="min-h-screen flex items-center justify-center px-6 py-16 relative">
+    <!-- Background glow -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-emerald-500/6 rounded-full blur-3xl" />
+    </div>
+
+    <div class="w-full max-w-md relative animate-scale-in">
+      <!-- Logo mark -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl mb-4 text-2xl">
+          🍃
+        </div>
+        <h1 class="text-2xl font-bold text-white">Bem-vindo de volta</h1>
+        <p class="text-slate-400 text-sm mt-1">Entre na sua conta para continuar</p>
+      </div>
+
+      <!-- Card -->
+      <div class="card p-8">
+        <!-- Error message -->
+        <div v-if="error" class="mb-5 flex items-center gap-3 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+          <i class="fas fa-exclamation-circle flex-shrink-0"></i>
+          {{ error }}
         </div>
 
-        <div class="card p-8 animate-slide-up">
-          <form @submit.prevent="handleLogin" class="space-y-6">
-            <div>
-              <label class="block text-gray-700 font-medium mb-2">Email</label>
-              <input
-                v-model="email"
-                type="email"
-                class="input w-full"
-                required
-                placeholder="Enter your email"
-              >
-            </div>
+        <form @submit.prevent="handleLogin" class="space-y-5">
+          <div>
+            <label class="label">E-mail</label>
+            <input
+              v-model="email"
+              type="email"
+              class="input"
+              placeholder="seu@email.com"
+              required
+              autocomplete="email"
+            />
+          </div>
 
-            <div>
-              <label class="block text-gray-700 font-medium mb-2">Password</label>
-              <input
-                v-model="password"
-                type="password"
-                class="input w-full"
-                required
-                placeholder="Enter your password"
-              >
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <input
-                  id="remember-me"
-                  type="checkbox"
-                  class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                >
-                <label for="remember-me" class="ml-2 block text-sm text-gray-700">
-                  Remember me
-                </label>
-              </div>
-              <a href="#" class="text-sm text-green-600 hover:text-green-700">
-                Forgot password?
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="label mb-0">Senha</label>
+              <a href="#" class="text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
+                Esqueci a senha
               </a>
             </div>
-
-            <button
-              type="submit"
-              class="btn btn-primary w-full"
-              :disabled="loading"
-            >
-              <span v-if="loading" class="flex items-center justify-center">
-                <i class="fas fa-spinner fa-spin mr-2"></i>
-                Signing in...
-              </span>
-              <span v-else>Sign In</span>
-            </button>
-
-            <div class="text-center">
-              <p class="text-gray-600">
-                Don't have an account?
-                <router-link to="/register" class="text-green-600 hover:text-green-700">
-                  Sign up
-                </router-link>
-              </p>
+            <div class="relative">
+              <input
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                class="input pr-11"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                @click="showPassword = !showPassword"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+              >
+                <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-sm"></i>
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input
+              id="remember"
+              v-model="rememberMe"
+              type="checkbox"
+              class="w-4 h-4 rounded border-slate-600 bg-surface-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0 focus:ring-offset-transparent"
+            />
+            <label for="remember" class="text-sm text-slate-400 cursor-pointer select-none">
+              Lembrar de mim
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary w-full py-3 text-sm"
+            :disabled="loading"
+          >
+            <span v-if="loading" class="flex items-center gap-2">
+              <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              Entrando...
+            </span>
+            <span v-else>Entrar</span>
+          </button>
+        </form>
+
+        <div class="divider my-6"></div>
+
+        <p class="text-center text-sm text-slate-400">
+          Não tem uma conta?
+          <router-link to="/register" class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors ml-1">
+            Criar conta
+          </router-link>
+        </p>
       </div>
     </div>
   </div>
@@ -82,53 +111,25 @@ import axios from 'axios'
 const router = useRouter()
 const email = ref('')
 const password = ref('')
+const rememberMe = ref(false)
+const showPassword = ref(false)
 const loading = ref(false)
+const error = ref('')
 
 const handleLogin = async () => {
+  error.value = ''
+  loading.value = true
   try {
-    loading.value = true
     const response = await axios.post('http://localhost:5000/api/users/login', {
       email: email.value,
       password: password.value
     })
-
     localStorage.setItem('token', response.data.token)
     router.push('/profile')
-  } catch (error) {
-    console.error('Login error:', error)
-    alert('Invalid credentials. Please try again.')
+  } catch {
+    error.value = 'E-mail ou senha incorretos. Tente novamente.'
   } finally {
     loading.value = false
   }
 }
 </script>
-
-<style scoped>
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-</style> 
